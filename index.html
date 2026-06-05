@@ -272,7 +272,7 @@ async function gtxTranslate(text){
   if(!text||!text.trim())return '';
   const chunks=chunkText(text,1400); let res='';
   for(const ch of chunks){
-    const url='https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q='+encodeURIComponent(ch);
+    const url='https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=zh-CN&dt=t&q='+encodeURIComponent(ch);
     const r=await fetch(url); if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json();
     res+=(j[0]||[]).map(s=>s[0]).join('');
