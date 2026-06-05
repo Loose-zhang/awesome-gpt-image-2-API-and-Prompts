@@ -226,7 +226,8 @@ function buildFilters(){
   wrap.querySelectorAll('.pill').forEach(p=>p.onclick=()=>{activeCat=p.dataset.cat;buildFilters();render();});
 }
 
-let renderLimit = 60;
+const RENDER_BATCH = 16;
+let renderLimit = RENDER_BATCH;
 function filtered(){
   const q = query.trim().toLowerCase();
   return DATA.cases.filter(c=>{
@@ -238,7 +239,7 @@ function filtered(){
 function render(reset=true){
   const g = document.getElementById('gallery'), t = I18N[LANG];
   const list = filtered();
-  if(reset){ g.innerHTML=''; renderLimit=60; }
+  if(reset){ g.innerHTML=''; renderLimit=RENDER_BATCH; }
   document.getElementById('empty').style.display = list.length? 'none':'block';
   const slice = list.slice(0, renderLimit);
   g.innerHTML = slice.map((c,idx)=>{
@@ -281,7 +282,7 @@ async function gtxTranslate(text){
 
 // infinite scroll
 const io = new IntersectionObserver(es=>{
-  es.forEach(e=>{ if(e.isIntersecting){ const list=filtered(); if(renderLimit<list.length){renderLimit+=60;render(false);} } });
+  es.forEach(e=>{ if(e.isIntersecting){ const list=filtered(); if(renderLimit<list.length){renderLimit+=RENDER_BATCH;render(false);} } });
 });
 
 function openModal(i){
