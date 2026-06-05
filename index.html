@@ -82,6 +82,9 @@
   .copybtn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s}
   .copybtn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
   .copybtn.done{background:#1d8a4e;color:#fff;border-color:#1d8a4e}
+  .copybtn:disabled{opacity:.6;cursor:default}
+  .pbtns{display:flex;gap:8px}
+  .transnote{font-size:11.5px;color:var(--muted);margin-top:7px;min-height:14px}
   .prompt{flex:1;background:#faf9f5;border:1px solid var(--line);border-radius:12px;padding:15px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;overflow:auto;max-height:46vh;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   .srcrow{margin-top:16px;padding-top:15px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.6}
   .srcrow a{color:var(--ink);font-weight:600}
@@ -163,9 +166,13 @@
       <div class="sub" id="mSub"></div>
       <div class="promptlabel">
         <span data-i="promptL">提示词 PROMPT</span>
-        <button class="copybtn" id="copyBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8" stroke="currentColor" stroke-width="2"/></svg><span id="copyTxt" data-i="copy">复制</span></button>
+        <div class="pbtns">
+          <button class="copybtn" id="transBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 5h7M8 3v2c0 4-2 7-5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 11c0 2 2 4 5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m13 21 4-10 4 10M14.5 17h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="transTxt" data-i="translate">翻译</span></button>
+          <button class="copybtn" id="copyBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8" stroke="currentColor" stroke-width="2"/></svg><span id="copyTxt" data-i="copy">复制</span></button>
+        </div>
       </div>
       <div class="prompt" id="mPrompt"></div>
+      <div class="transnote" id="mTransNote"></div>
       <div class="srcrow" id="mSrc"></div>
     </div>
   </div>
@@ -177,6 +184,7 @@ const I18N = {
     herodesc:"一个可浏览、可搜索、可一键复制的 GPT-Image-2 提示词合集。所有案例均整理自开源仓库 awesome-gpt-image-2-prompts，每条提示词都标注了原始作者与来源链接。",
     stTotalL:"条提示词",stCatL:"个分类",stLicL:"仓库开源协议",empty:"没有匹配的结果。",all:"全部",
     promptL:"提示词 PROMPT",copy:"复制",copied:"已复制",byL:"作者",sourceL:"来源",viewSource:"查看原始来源 ↗",
+    translate:"翻译",translating:"翻译中…",showOrig:"显示原文",transNote:"机器翻译，仅供参考",transFail:"翻译失败，请检查网络后重试",
     fAbout:"关于本站",fAboutP:'本站是基于开源项目 <a href="https://github.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts" target="_blank" rel="noopener">awesome-gpt-image-2-prompts</a> 构建的提示词浏览画廊，由 MZ（Mingzhe Zhang）整理与部署。界面布局参考了 <a href="https://www.meigen.ai" target="_blank" rel="noopener">MeiGen (meigen.ai)</a> 的画廊风格，仅作设计灵感参考。',
     fSource:"来源与署名",fSourceP:"每条提示词卡片均链接到其原始作者与发布来源（多数来自 X / Twitter）。版权归各原作者所有。提示词文本依仓库 LICENSE 以 CC0 1.0 协议发布；示例图片用于学习与参考展示。",
     fContact:"合规与下架",fContactP:"本站仅用于学习、研究与交流，不含商业用途。GPT Image 2 为 OpenAI 的模型，相关名称归各自所有者。若您是某作品的权利人并希望下架，请通过原仓库 Issue 联系，我们会及时处理。",
@@ -185,6 +193,7 @@ const I18N = {
     herodesc:"A browsable, searchable, one-click-copy collection of GPT-Image-2 prompts. Every case is curated from the open-source awesome-gpt-image-2-prompts repository, with the original author and source linked for each prompt.",
     stTotalL:"prompts",stCatL:"categories",stLicL:"repository license",empty:"No matching results.",all:"All",
     promptL:"PROMPT",copy:"Copy",copied:"Copied",byL:"By",sourceL:"Source",viewSource:"View original source ↗",
+    translate:"Translate",translating:"Translating…",showOrig:"Show original",transNote:"Machine translation, for reference only",transFail:"Translation failed — check your connection and retry",
     fAbout:"About",fAboutP:'A prompt-browsing gallery built on the open-source project <a href="https://github.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts" target="_blank" rel="noopener">awesome-gpt-image-2-prompts</a>, curated and deployed by MZ (Mingzhe Zhang). The layout takes design inspiration from <a href="https://www.meigen.ai" target="_blank" rel="noopener">MeiGen (meigen.ai)</a> for reference only.',
     fSource:"Sources & Attribution",fSourceP:"Each prompt card links to its original author and source (mostly X / Twitter). Copyright belongs to the respective creators. Prompt text is released under CC0 1.0 per the repository LICENSE; sample images are shown for study and reference.",
     fContact:"Compliance & Takedown",fContactP:"This site is for learning, research and exchange only, with no commercial use. GPT Image 2 is OpenAI's model; all names belong to their respective owners. If you are a rights holder and want a work removed, please open an Issue on the source repository and we will act promptly.",
@@ -248,6 +257,28 @@ function render(reset=true){
 }
 function escapeHtml(s){return (s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
+// --- machine translation (client-side, free Google gtx endpoint) ---
+const TRANS = {}; // cache: case id -> zh text
+function chunkText(t,max){
+  const parts=[]; let buf='';
+  const tokens=t.split(/(?<=[.!?。！？,，;；\n])/);
+  for(const tok of tokens){ if((buf+tok).length>max){ if(buf)parts.push(buf); buf=tok; } else buf+=tok; }
+  if(buf)parts.push(buf);
+  const out=[]; for(const p of parts){ if(p.length<=max)out.push(p); else for(let i=0;i<p.length;i+=max)out.push(p.slice(i,i+max)); }
+  return out;
+}
+async function gtxTranslate(text){
+  if(!text||!text.trim())return '';
+  const chunks=chunkText(text,1400); let res='';
+  for(const ch of chunks){
+    const url='https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q='+encodeURIComponent(ch);
+    const r=await fetch(url); if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    res+=(j[0]||[]).map(s=>s[0]).join('');
+  }
+  return res;
+}
+
 // infinite scroll
 const io = new IntersectionObserver(es=>{
   es.forEach(e=>{ if(e.isIntersecting){ const list=filtered(); if(renderLimit<list.length){renderLimit+=60;render(false);} } });
@@ -261,7 +292,19 @@ function openModal(i){
   const catlabel = (LANG==='zh'?cat.zh:cat.en)||c.category;
   const authorTxt = c.author? `${t.byL} @${c.author}` : '';
   document.getElementById('mSub').innerHTML = `${cat.emoji||''} ${catlabel}${c.author?' · '+ (c.authorUrl?`<a href="${c.authorUrl}" target="_blank" rel="noopener">@${escapeHtml(c.author)}</a>`:'@'+escapeHtml(c.author)):''}`;
-  document.getElementById('mPrompt').textContent = c.prompt||'';
+  const pe = document.getElementById('mPrompt'); pe.textContent = c.prompt||'';
+  // translate button (toggles original <-> 中文, cached per case)
+  const tb=document.getElementById('transBtn'), tt=document.getElementById('transTxt'), note=document.getElementById('mTransNote');
+  let showing='orig'; note.textContent=''; tt.textContent=t.translate; tb.disabled=false;
+  tb.onclick=async()=>{
+    const u=I18N[LANG];
+    if(showing==='zh'){ pe.textContent=c.prompt||''; note.textContent=''; tt.textContent=u.translate; showing='orig'; return; }
+    if(TRANS[c.id]!==undefined){ pe.textContent=TRANS[c.id]; note.textContent=u.transNote; tt.textContent=u.showOrig; showing='zh'; return; }
+    tb.disabled=true; tt.textContent=u.translating; note.textContent='';
+    try{ const zh=await gtxTranslate(c.prompt||''); TRANS[c.id]=zh; pe.textContent=zh; note.textContent=u.transNote; tt.textContent=u.showOrig; showing='zh'; }
+    catch(e){ note.textContent=u.transFail; tt.textContent=u.translate; console.error(e); }
+    finally{ tb.disabled=false; }
+  };
   let srcHtml = '';
   if(c.source) srcHtml += `${t.sourceL}: <a href="${c.source}" target="_blank" rel="noopener">${t.viewSource}</a><br>`;
   srcHtml += LANG==='zh'
@@ -270,7 +313,7 @@ function openModal(i){
   document.getElementById('mSrc').innerHTML = srcHtml;
   const cb = document.getElementById('copyBtn'); cb.classList.remove('done');
   document.getElementById('copyTxt').textContent = t.copy;
-  cb.onclick = ()=>{ navigator.clipboard.writeText(c.prompt||'').then(()=>{
+  cb.onclick = ()=>{ navigator.clipboard.writeText(pe.textContent||'').then(()=>{
     cb.classList.add('done'); document.getElementById('copyTxt').textContent=t.copied;
     setTimeout(()=>{cb.classList.remove('done');document.getElementById('copyTxt').textContent=t.copy;},1500);
   });};
