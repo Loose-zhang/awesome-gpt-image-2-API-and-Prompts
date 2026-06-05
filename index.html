@@ -226,7 +226,7 @@ function buildFilters(){
   wrap.querySelectorAll('.pill').forEach(p=>p.onclick=()=>{activeCat=p.dataset.cat;buildFilters();render();});
 }
 
-const RENDER_BATCH = 16;
+const RENDER_BATCH = 8;
 let renderLimit = RENDER_BATCH;
 function filtered(){
   const q = query.trim().toLowerCase();
